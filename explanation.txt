@@ -1,0 +1,64 @@
+Topic: Semantic Search System for Transcript Q&A
+
+───────────────────────────────────────────────────────────────
+🧠 Problem Statement:
+───────────────────────────────────────────────────────────────
+Build a semantic search system that reads a timestamped transcript and answers user questions by returning the most relevant passage (paragraph/sentence) with its timestamp. The system should support multiple semantic search strategies and be accessible via a simple CLI.
+
+───────────────────────────────────────────────────────────────
+🛠️ My Approach:
+───────────────────────────────────────────────────────────────
+
+1. 🗂 Transcript Preprocessing
+
+- The transcript was provided as a plain text file with time-based segments.
+- I used a regular expression to extract `[timestamp] text` pairs.
+- To ensure semantically meaningful answers, I grouped every 5–6 timestamped lines into "chunks" representing coherent paragraphs.
+- These chunks are then embedded and searched.
+
+2. ⚙️ Semantic Search Modes Implemented
+
+The application supports 3 independent search strategies via CLI flags:
+
+───────────────────────────────────────────────────────────────
+A. TF-IDF with Cosine Similarity  → (Mode: `tfidf`)
+───────────────────────────────────────────────────────────────
+
+- Libraries used: `scikit-learn`
+- Each chunk is vectorized using TF-IDF.
+- The user's query is also transformed and compared against the transcript chunks using cosine similarity.
+- The top matching chunk is selected based on the highest similarity score.
+- ✅ Fast and lightweight.
+- ❌ Lacks deep semantic understanding — mostly surface-level word matches.
+
+───────────────────────────────────────────────────────────────
+B. OpenAI Embedding Search        → (Mode: `llm1`)
+───────────────────────────────────────────────────────────────
+
+- Library: `openai` (v1.x)
+- Embedding model: `text-embedding-3-small`
+- Each chunk is embedded into a 1536-d vector space.
+- The query is also embedded and cosine similarity is computed between the query and each chunk.
+- This method provides accurate semantic matches, even if the query has no lexical overlap.
+- Requires a valid OpenAI API key and working credit.
+- ❌ Quota-limited; can fail if key has no active balance.
+
+───────────────────────────────────────────────────────────────
+C. Hugging Face Embedding Search → (Mode: `llm2`)
+───────────────────────────────────────────────────────────────
+
+- Library: `sentence-transformers`
+- Model used: `all-MiniLM-L6-v2`
+- Each chunk is embedded into a 384-d vector.
+- Cosine similarity is computed between the user query and all paragraph chunks.
+- This method is fast and free to use (no API key needed).
+- ⚖️ Slightly less accurate than OpenAI embeddings but good enough for most use cases.
+
+───────────────────────────────────────────────────────────────
+🔍 Output Method
+
+- For all models, I compute `cosine similarity` between the query and each chunk.
+- This produces a numerical score between 0 and 1, representing how semantically close the query is to the content in each chunk.
+- If the highest similarity score exceeds a predefined threshold, the system returns the corresponding chunk and timestamp as the most relevant answer.
+- If no chunk exceeds the threshold, the system returns: [Not found], No relevant information found in the transcript.
+

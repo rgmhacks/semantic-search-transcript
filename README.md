@@ -32,7 +32,7 @@ python transcript.py transcript.txt llm2    # Hugging Face model mode
 ```
 
 ### 📚 Project Structure:
-
+```
 semantic-search-transcript/
 ├── transcript.py # CLI entry point
 ├── transcript.txt # Timestamped transcript
@@ -43,3 +43,4 @@ semantic-search-transcript/
 ├── output.txt # Output
 ├── requirements.txt # Python dependencies
 └── README.md # Project overview and instructions
+```
